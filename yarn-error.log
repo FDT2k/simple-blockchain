@@ -1,0 +1,69 @@
+Arguments: 
+  /home/fabien/.nvm/versions/node/v9.11.1/bin/node /usr/bin/yarn install
+
+PATH: 
+  /home/fabien/.nvm/versions/node/v9.11.1/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/opt/cuda/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/var/lib/snapd/snap/bin
+
+Yarn version: 
+  1.7.0
+
+Node version: 
+  9.11.1
+
+Platform: 
+  linux x64
+
+Trace: 
+  SyntaxError: /home/fabien/Documents/work/blockchain/package.json: Unexpected token } in JSON at position 738
+      at JSON.parse (<anonymous>)
+      at /usr/lib/node_modules/yarn/lib/cli.js:1130:59
+      at Generator.next (<anonymous>)
+      at step (/usr/lib/node_modules/yarn/lib/cli.js:98:30)
+      at /usr/lib/node_modules/yarn/lib/cli.js:109:13
+      at <anonymous>
+
+npm manifest: 
+  {
+  	"name": "blockchain",
+  	"main": "src/index.js",
+  	"licence": "MIT",
+  
+  	"scripts": {
+  		"start": "npx nodemon",
+  		"debug": "npx nodemon --inspect",
+  		"lint": "./node_modules/.bin/eslint src/**/*.js",
+  		"test": "./node_modules/mocha/bin/mocha -R spec src/**/*.spec.js --exit",
+  		"test:watch": "npm run test -- --watch"
+  	},
+  	"dependencies": {
+  		"awilix": "^3.0.8",
+  		"awilix-express": "^1.1.0",
+  		"axios": "^0.18.0",
+  		"bluebird": "^3.5.1",
+  		"body-parser": "^1.18.3",
+  
+  		"express": "^4.16.3",
+  		"express-server-factory": "^0.1.10",
+  		"express-useragent": "^1.0.12",
+  		"jsonwebtoken": "^8.2.2",
+  		"lodash": "^4.17.10",
+  		"moment": "^2.22.1",
+  		"morgan": "^1.9.0",
+  		"promise-mysql": "^3.2.1",
+  		"randomstring": "^1.1.5",
+  		"sha1": "^1.1.1",
+  	},
+  	"devDependencies": {
+  		"eslint": "^4.19.1",
+  		"mocha": "^5.2.0",
+  		"nodemon": "^1.17.4",
+  		"should": "^13.2.1",
+  		"sleep": "^5.1.1"
+  	}
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
