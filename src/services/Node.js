@@ -9,11 +9,17 @@ class Node {
 
   mine(){
     console.log('---------mining-------')
+
+    let next_block = this.blockchain.next_block;
+
+    let last_block = this.blockchain.last_block;
+
+    let proof = this.blockchain.proof_of_work({last_block,next_block});
+
+/*
     // We run the proof of work algorithm to get the next proof...
     let last_block = this.blockchain.last_block
-    let proof = this.blockchain.proof_of_work(last_block)
-
-
+    let proof = this.blockchain.proof_of_work(last_block,next_block);
 
     // Forge the new Block by adding it to the chain
     let previous_hash = Blockchain.hash(last_block)
@@ -36,6 +42,7 @@ class Node {
         'previous_hash': block['previous_hash'],
     }
     return response;
+    */
   }
 
 }

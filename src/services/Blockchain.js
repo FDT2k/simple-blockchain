@@ -3,13 +3,28 @@ const _ = require('lodash');
 const crypto = require('crypto');
 const axios = require ('axios');
 const Promise = require ('bluebird');
+const Block = require ('./Block');
+
+const {validate_proof,valid_chain,hash_block} = require('../services/Blockchain_utils')
+
 const {URL} = require('url');
 class Blockchain {
   constructor(){
       this.current_transactions = [];
       this.chain = [];
       this.nodes = [];
-      this.new_block({previous_hash:'1', proof:100})
+      this._next_block= null;
+    //  this.new_block({previous_hash:'1', proof:100})
+      this.create_genesis_block();
+  }
+
+  create_genesis_block(){
+    let block = new Block({index:0,transactions:[],nonce:100,previous_hash:1});
+    this.append_block(block);
+  }
+
+  append_block(block){
+    this.chain.push(block);
   }
 
   get last_block(){
@@ -31,42 +46,22 @@ class Blockchain {
     return false;
   }
 
-  static valid_chain(chain){
-    /*
-    Determine if a given blockchain is valid
-    :param chain: A blockchain
-    :return: True if valid, False if not
-    */
+  get next_block(){
+    if(this.current_transactions.length>0 && this._next_block == null){
+      this._next_block = new Block({
+              'index': this.chain.length + 1,
+              'timestamp': new Date().getTime(),
+              'transactions': this.current_transactions,
+              'nonce':0,
+              'previous_hash':  this.last_block.hash
+          });
+      this.current_transactions = [];
 
-    let last_block = chain[0]
-    let current_index = 1; //no check on genesis block.
-
-    while (current_index < chain.length){
-      let block = chain[current_index]
-    //  console.log(last_block);
-    //  console.log(block);
-    //  console.log('-----------');
-    /*  print('{last_block}')
-      print(f'{block}')
-      print("\n-----------\n")*/
-      // Check that the hash of the block is correct
-      let last_block_hash = Blockchain.hash(last_block)
-      if(block.previous_hash != last_block_hash){
-        return false;
-      }
-      /*if(block.hash != Blockchain.hash(block)){
-        return false;
-      }*/
-
-      // Check that the Proof of Work is correct
-      if (!Blockchain.valid_proof({last_proof:last_block.proof,proof: block.proof, last_hash:last_block_hash})){
-        return false
-      }
-      last_block = block
-      current_index += 1
     }
-    return true
+    return this._next_block;
+
   }
+
 
    resolve_conflicts(){
      /*
@@ -107,12 +102,9 @@ class Blockchain {
         }
          return false;
       });
-
-
-
    }
 
-  new_block({proof, previous_hash}){
+//  new_block({proof, previous_hash}){
     /*
     Create a new Block in the Blockchain
     :param proof: The proof given by the Proof of Work algorithm
@@ -120,7 +112,7 @@ class Blockchain {
     :return: New Block
     */
 
-    let block = {
+/*    let block = {
         'index': this.chain.length + 1,
         'timestamp': new Date().getTime(),
         'transactions': this.current_transactions,
@@ -133,7 +125,8 @@ class Blockchain {
 
     this.chain.push(block)
     return block
-  }
+  }*/
+
 
   new_transaction({sender, recipient, amount}){
     /*
@@ -152,7 +145,7 @@ class Blockchain {
     return this.last_block['index'] + 1
   }
 
-  proof_of_work( last_block){
+  proof_of_work( {last_block,next_block}){
     /*
     Simple Proof of Work Algorithm:
      - Find a number p' such that hash(pp') contains leading 4 zeroes
@@ -161,51 +154,20 @@ class Blockchain {
     :param last_block: <dict> last Block
     :return: <int>
     */
-
+/*
     let last_proof = last_block.proof
     let last_hash = Blockchain.hash(last_block)
-
-    let proof = 0
-    while (!Blockchain.valid_proof({last_proof, proof, last_hash})){
-        proof += 1
+    let next_hash = Blockchain.hash(next_block)
+*/
+    while (!validate_proof({previous_block:last_block,next_block})){
+        next_block.nonce += 1
     }
-    return proof
+    return next_block.nonce;
   }
 
-  static valid_proof({last_proof, proof, last_hash}){
-    /*
-    Validates the Proof
-    :param last_proof: <int> Previous Proof
-    :param proof: <int> Current Proof
-    :param last_hash: <str> The hash of the Previous Block
-    :reurn: <bool> True if correct, False if not.
-    */
 
-  //  guess = f'{last_proof}{proof}{last_hash}'.encode()
 
-    let guess = `${last_proof}${proof}${last_hash}`;
-  //  console.log(guess);
-    let guess_hash = crypto.createHash('sha256')
-                       .update(guess)
-                       .digest('hex');
-    return guess_hash.substr(guess_hash.length - 4)== "0000";
-  }
 
-  static hash(block){
-    /*
-    Creates a SHA-256 hash of a Block
-    :param block: Block
-    */
-
-    // We must make sure that the Dictionary is Ordered, or we'll have inconsistent hashes
-
-    let block_string = JSON.stringify(_(_.omit(block,'hash')).toPairs().sortBy(0).fromPairs().value());
-    console.log('block_string', block_string);
-    //return hashlib.sha256(block_string).hexdigest()
-    return crypto.createHash('sha256')
-                       .update(block_string)
-                       .digest('hex');
-  }
 }
 
 module.exports = Blockchain;
