@@ -2,6 +2,9 @@ const should = require('should')
 
 const Blockchain = require('../services/Blockchain')
 const Node = require ('../services/Node');
+
+const {validate_proof,valid_chain,hash_block} = require('../services/Blockchain_utils')
+
 describe('Blockchain',  () => {
 
     it('should instanciate', () => {
@@ -23,9 +26,9 @@ describe('Blockchain',  () => {
       let cc = new Blockchain()
       cc.should.be.an.Object();
       should(cc.current_transactions.length).be.exactly(0);
-      let _block = cc.new_transaction({sender:'dkdkd',recipient:'blabla',amount:0});
+      let _index = cc.new_transaction({sender:'dkdkd',recipient:'blabla',amount:0});
       should(cc.current_transactions.length).be.exactly(1);
-      should(_block).be.exactly(1);
+      should(_index).be.exactly(2);
     })
 
     it('should register node', () => {
@@ -53,35 +56,23 @@ describe('Node',  () => {
     cc.should.be.an.Object();
     let _block = b.new_transaction({sender:'dkdkd',recipient:'blabla',amount:0});
     cc.mine();
-  //  console.log(b.chain);
-    cc.mine();
-  //  console.log(b.chain);
-  })
-/*
+    should(b.chain.length).be.exactly(2);
+    should(()=>{cc.mine();}).throw('no_block_to_be_mined');
+  } ).timeout(50000);
+
+
+
   it('should have a valid chain', () => {
     let b = new Blockchain();
     let cc = new Node(b,'hello');
     cc.should.be.an.Object();
     let _block = b.new_transaction({sender:'dkdkd',recipient:'blabla',amount:0});
     cc.mine();
-    cc.mine();
-    let res = Blockchain.valid_chain(b.chain);
+  //  cc.mine();
+    let res = valid_chain(b.chain);
     should(res).be.exactly(true);
-  })
-  */
-  /*
-  it('should not have a valid chain', () => {
-    let b = new Blockchain();
-    let cc = new Node(b,'hello');
-    cc.should.be.an.Object();
-    let _block = b.new_transaction({sender:'dkdkd',recipient:'blabla',amount:0});
-    cc.mine();
-    cc.mine();
-    // inject fake transaction in block
-    b.chain[1].transactions.push({message:'faked'});
-    let res = Blockchain.valid_chain(b.chain);
-    should(res).be.exactly(false);
-  })
+  }).timeout(50000);
+
 
   it('should not have a valid chain', () => {
     let b = new Blockchain();
@@ -89,13 +80,27 @@ describe('Node',  () => {
     cc.should.be.an.Object();
     let _block = b.new_transaction({sender:'dkdkd',recipient:'blabla',amount:0});
     cc.mine();
+  //  cc.mine();
+    // inject fake transaction in block
+    b.chain[1].block.transactions.push({message:'faked'});
+    let res = valid_chain(b.chain);
+    should(res).be.exactly(false);
+  }).timeout(50000);
+
+  it('should not have a valid chain', () => {
+    let b = new Blockchain();
+    let cc = new Node(b,'hello');
+    cc.should.be.an.Object();
+    let _block = b.new_transaction({sender:'dkdkd',recipient:'blabla',amount:0});
     cc.mine();
+      //_block = b.new_transaction({sender:'dkdkd',recipient:'blabla',amount:0});
+  //  cc.mine();
     // inject fake transaction in last block
   //  console.log(b.chain.length-1);
   //  console.log(b.chain);
-    b.chain[b.chain.length-1].transactions.push({message:'faked'});
-    let res = Blockchain.valid_chain(b.chain);
+    b.chain[b.chain.length-1].block.transactions.push({message:'faked'});
+    let res = valid_chain(b.chain);
     should(res).be.exactly(false);
-  })*/
+  }).timeout(50000);
 
 });

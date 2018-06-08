@@ -19,12 +19,13 @@ class Blockchain {
   }
 
   create_genesis_block(){
-    let block = new Block({index:0,transactions:[],nonce:100,previous_hash:1});
-    this.append_block(block);
+    let block = new Block({index:1,transactions:[],nonce:100,previous_hash:1});
+    this.append_block_to_chain(block);
   }
 
-  append_block(block){
+  append_block_to_chain(block){
     this.chain.push(block);
+  //  this._next_block=null;
   }
 
   get last_block(){
@@ -47,6 +48,7 @@ class Blockchain {
   }
 
   get next_block(){
+    /*return the next block while not mined*/
     if(this.current_transactions.length>0 && this._next_block == null){
       this._next_block = new Block({
               'index': this.chain.length + 1,
@@ -59,7 +61,6 @@ class Blockchain {
 
     }
     return this._next_block;
-
   }
 
 

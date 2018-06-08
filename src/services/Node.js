@@ -12,11 +12,20 @@ class Node {
 
     let next_block = this.blockchain.next_block;
 
-    let last_block = this.blockchain.last_block;
+    if(next_block != null){
+      console.log('mining block',next_block);
+      let last_block = this.blockchain.last_block;
 
-    let proof = this.blockchain.proof_of_work({last_block,next_block});
+      let proof = this.blockchain.proof_of_work({last_block,next_block});
 
+      this.blockchain.append_block_to_chain(next_block);
+      this.blockchain._next_block=null;
+
+    }else{
+      throw new Error('no_block_to_be_mined');
+    }
 /*
+
     // We run the proof of work algorithm to get the next proof...
     let last_block = this.blockchain.last_block
     let proof = this.blockchain.proof_of_work(last_block,next_block);
