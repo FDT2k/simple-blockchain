@@ -129,7 +129,7 @@ class Blockchain {
   }*/
 
 
-  new_transaction({sender, recipient, amount}){
+  new_transaction(transaction){
     /*
     Creates a new transaction to go into the next mined Block
     :param sender: Address of the Sender
@@ -137,13 +137,9 @@ class Blockchain {
     :param amount: Amount
     :return: The index of the Block that will hold this transaction
     */
-    this.current_transactions.push({
-        'sender': sender,
-        'recipient': recipient,
-        'amount': amount,
-    });
+    this.current_transactions.push(transaction);
 
-    return this.last_block['index'] + 1
+    return this.last_block['index'] + 1 // this is wrong since we handle next_block differently
   }
 
   proof_of_work( {last_block,next_block}){

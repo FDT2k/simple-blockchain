@@ -6,6 +6,14 @@ class Node {
     this.identifier = identifier;
     this.blockchain = blockchain;
   }
+  new_transaction(transaction){
+    let block = this.blockchain.new_transaction(transaction);
+    let response = {
+      "message": "transaction added",
+      'block_index': block
+    }
+    return response;
+  }
 
   mine(){
     console.log('---------mining-------')
@@ -16,11 +24,19 @@ class Node {
       console.log('mining block',next_block);
       let last_block = this.blockchain.last_block;
 
-      let proof = this.blockchain.proof_of_work({last_block,next_block});
+      let nonce = this.blockchain.proof_of_work({last_block,next_block});
 
       this.blockchain.append_block_to_chain(next_block);
       this.blockchain._next_block=null;
-
+      let response = {
+          'message': "New Block Forged",
+          'index': next_block['index'],
+          'transactions': next_block['transactions'],
+          'nonce': nonce,
+          'previous_hash': next_block['previous_hash'],
+          hash:next_block.hash
+      }
+      return response;
     }else{
       throw new Error('no_block_to_be_mined');
     }
